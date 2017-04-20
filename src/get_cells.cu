@@ -1,5 +1,5 @@
 #include <cuda.h>
-#include <cutil_inline.h>
+//#include <cutil_inline.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -664,14 +664,14 @@ int voc_prepare_image2(const ftype* h_pImg, int width, int height, int sbin)
         //printf("preparing reference images... iwid = %d, ihei = %d\n", iwid, ihei);
         
         cudaChannelFormatDesc chDes = cudaCreateChannelDesc<float4>();
-        cutilSafeCall(cudaMallocArray(&(imageArray[o]), &chDes, iwid, ihei) );
+        cudaMallocArray(&(imageArray[o]), &chDes, iwid, ihei);
 
         if (o == 0)
-            cutilSafeCall(cudaMemcpyToArray(imageArray[o], 0, 0, d_pImage, sizeof(float4)*width*height, cudaMemcpyDeviceToDevice));
+            cudaMemcpyToArray(imageArray[o], 0, 0, d_pImage, sizeof(float4)*width*height, cudaMemcpyDeviceToDevice);
         else{
             //voc_resize_image(width, height, iwid, ihei, 0); // or o-1
             voc_resize_image(lastwid, lasthei, iwid, ihei, o-1);
-            cutilSafeCall(cudaMemcpyToArray(imageArray[o], 0, 0, d_RescaledImage, sizeof(float4)*iwid*ihei, cudaMemcpyDeviceToDevice));
+            cudaMemcpyToArray(imageArray[o], 0, 0, d_RescaledImage, sizeof(float4)*iwid*ihei, cudaMemcpyDeviceToDevice);
         }
         scale /= 2.0f;
         lastwid = iwid;
@@ -718,7 +718,7 @@ int voc_destroy_image2()
     //int maxoct = (int)log2(min(height, width) / (float)(sbin)) - 1;
     int maxoct = gmaxoct;
     for (int o = 0; o < maxoct; o++)
-        cutilSafeCall(cudaFreeArray(imageArray[o]));
+        cudaFreeArray(imageArray[o]);
     free(imageArray);
 
     if( d_RescaledImage) {
@@ -753,19 +753,19 @@ __host__ void voc_resize_image(int width, int height, int res_wid, int res_hei, 
 
 	// Binding every time?
     cudaArray* imageArr = imageArray[oct];
-    cutilSafeCall(cudaBindTextureToArray(tex, imageArr, channelDescDownscale));
+    cudaBindTextureToArray(tex, imageArr, channelDescDownscale);
 
     // should we reallocate the d_RescaledImage?
     //cutilSafeCall(cudaFree(d_RescaledImage));
     //cutilSafeCall(cudaMalloc((void**)&d_RescaledImage, res_wid * res_hei * sizeof(float4)));
-    cutilSafeCall(cudaMemset(d_RescaledImage, 0, res_wid * res_hei * sizeof(float4)));
+    cudaMemset(d_RescaledImage, 0, res_wid * res_hei * sizeof(float4));
     
     float invScalX = (float)width / (float)res_wid;
     float invScalY = (float)height / (float)res_hei;
     
     if (invScalX == 1.0f && invScalY == 1.0f && oct == 0)
     {
-        cutilSafeCall(cudaMemcpy(d_RescaledImage, d_pImage, sizeof(float4)*res_wid*res_hei, cudaMemcpyDeviceToDevice));
+        cudaMemcpy(d_RescaledImage, d_pImage, sizeof(float4)*res_wid*res_hei, cudaMemcpyDeviceToDevice);
         //printf("invX=%f,invY=%f,res_wid=%d,res_hei=%d\n", invScalX, invScalY, res_wid, res_hei);
     }
     else
@@ -774,7 +774,7 @@ __host__ void voc_resize_image(int width, int height, int res_wid, int res_hei, 
 	    d_resize_bicubic<<<hBlockSize, hThreadSize>>>(d_RescaledImage, res_wid, res_hei, invScalX, invScalY);
     }
 
-    cutilSafeCall(cudaUnbindTexture(tex));
+    cudaUnbindTexture(tex);
     
 }
 
@@ -789,18 +789,18 @@ __host__ void voc_debug_resize_image(int width, int height, int res_wid, int res
     cudaArray* imageArr = imageArray[oct];
     cudaChannelFormatDesc chDes = cudaCreateChannelDesc<float4>();
 
-    cutilSafeCall(cudaBindTextureToArray(tex, imageArr, chDes));
+    cudaBindTextureToArray(tex, imageArr, chDes);
 
     // should we reallocate the d_RescaledImage?
     //cutilSafeCall(cudaMemset(d_RescaledImage, 0, width * height * sizeof(float4)));
-    cutilSafeCall(cudaMemset(d_RescaledImage, 0, res_wid * res_hei * sizeof(float4)));
+    cudaMemset(d_RescaledImage, 0, res_wid * res_hei * sizeof(float4));
     float invScalX = (float)width / (float)res_wid;
     float invScalY = (float)height / (float)res_hei;
 	//d_resize_bicubic<<<hBlockSize, hThreadSize>>>(d_RescaledImage, d_pImage, res_wid, res_hei, invScalX, invScalY);
 
     if (invScalX == 1.0f && invScalY == 1.0f && oct == 0)
     {
-        cutilSafeCall(cudaMemcpy(d_RescaledImage, d_pImage, sizeof(float4)*res_wid*res_hei, cudaMemcpyDeviceToDevice));
+        cudaMemcpy(d_RescaledImage, d_pImage, sizeof(float4)*res_wid*res_hei, cudaMemcpyDeviceToDevice);
         //printf("invX=%f,invY=%f,res_wid=%d,res_hei=%d\n", invScalX, invScalY, res_wid, res_hei);
     }
     else
@@ -808,9 +808,9 @@ __host__ void voc_debug_resize_image(int width, int height, int res_wid, int res
 	//d_resize_bicubic<<<hBlockSize, hThreadSize>>>(d_RescaledImage, d_pImage, res_wid, res_hei, invScalX, invScalY);
 	    d_resize_bicubic<<<hBlockSize, hThreadSize>>>(d_RescaledImage, res_wid, res_hei, invScalX, invScalY);
     }
-    cutilSafeCall(cudaUnbindTexture(tex));
+    cudaUnbindTexture(tex);
 
-    cutilSafeCall(cudaMemcpy(res_img, (float*)d_RescaledImage, sizeof(float) * res_wid * res_hei * 4, cudaMemcpyDeviceToHost));
+    cudaMemcpy(res_img, (float*)d_RescaledImage, sizeof(float) * res_wid * res_hei * 4, cudaMemcpyDeviceToHost);
     //cutilSafeCall(cudaMemcpyFromArray(res_img, imageArr, 0, 0, width*height*sizeof(float4), cudaMemcpyDeviceToHost));
 }
 

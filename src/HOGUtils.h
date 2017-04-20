@@ -16,7 +16,7 @@
 #endif
 
 #include <cuda_gl_interop.h>
-#include "cutil_inline.h"
+//#include "cutil_inline.h"
 #include <cuda.h>
 #include "HOGDefines.h"
 

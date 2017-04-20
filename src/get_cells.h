@@ -1,6 +1,9 @@
 #ifndef __GRADIENTS_H__
 #define __GRADIENTS_H__
 
+// Includes CUDA
+#include <cuda_runtime.h>
+
 int voc_prepare_image(const float* h_pImg, int width, int height);                                      
 
 extern __host__ int voc_compute_gradients( int width, int height, int sbin,

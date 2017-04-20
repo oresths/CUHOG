@@ -11,7 +11,8 @@ SOURCES = voc_hog.cpp process.cpp
 CUSOURCES = get_cells.cu get_features.cu timer.cu HOGUtils.cu
 
 CUDA_SDK_PATH = /home/hushell/NVIDIA_GPU_Computing_SDK
-LIBS += -lcudart -L/usr/local/cuda/lib64 -L$${CUDA_SDK_PATH}/C/lib -lcutil_x86_64 -lrt
+#LIBS += -lcudart -L/usr/local/cuda/lib64 -L$${CUDA_SDK_PATH}/C/lib -lcutil_x86_64 -lrt
+LIBS += -lcudart -L/usr/local/cuda/lib64 -L$${CUDA_SDK_PATH}/C/lib -lrt
 
 QMAKE_CUC = nvcc
 cu.name = Cuda ${QMAKE_FILE_IN}

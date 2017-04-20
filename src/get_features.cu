@@ -297,7 +297,7 @@ __host__ int voc_compute_features(int blocks_0, int blocks_1,
 	PRINT_TRACE_DATA(stdout);
     */
 
-//#define DEBUG_voc_compute_features
+#define DEBUG_voc_compute_features
 #ifdef DEBUG_voc_compute_features
 
 	float *h_pOut = (float*)malloc(out[0]*out[1]*out[2]*sizeof(float));
@@ -310,7 +310,7 @@ __host__ int voc_compute_features(int blocks_0, int blocks_1,
 
 	// write complete output to file
 	FILE* fp = fopen("cell_feats.txt", "w");
-	if(!fp) 
+	if(!fp)
         printf("failed to open output file: fmag\n");
 
     int ci, cj, cb;

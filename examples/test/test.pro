@@ -6,6 +6,6 @@ HEADERS =
 SOURCES = main.cpp
 
 INCLUDEPATH += ../../src 
-LIBS += -lVOCHOG -L../../src -L/usr/local/cuda/lib64 
+LIBS += -lVOCHOG -L../../src -L/usr/local/cuda/lib64 -lQtCore
 
 DESTDIR = ../../bin

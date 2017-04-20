@@ -1,5 +1,5 @@
 #include <cuda.h>
-#include <cutil_inline.h>
+//#include <cutil_inline.h>
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
@@ -68,11 +68,11 @@ void voc_hog_resize_image(int width, int height, int res_wid, int res_hei, int o
     printf("time in voc_hog_resize_image = %f\n", getTimerValue(&tt));
 #endif
 
-    cutilSafeCall(cudaMemset(d_pHist, 0, MAX_ALLOC * MAX_ALLOC * MAX_BINS * sizeof(float)));
+    cudaMemset(d_pHist, 0, MAX_ALLOC * MAX_ALLOC * MAX_BINS * sizeof(float));
 
-    cutilSafeCall(cudaMemset(d_pNorm, 0, MAX_ALLOC * MAX_ALLOC * sizeof(float)));
+    cudaMemset(d_pNorm, 0, MAX_ALLOC * MAX_ALLOC * sizeof(float));
 
-    cutilSafeCall(cudaMemset(d_pOut, 0, MAX_ALLOC * MAX_ALLOC * MAX_DIMS * sizeof(float))); 
+    cudaMemset(d_pOut, 0, MAX_ALLOC * MAX_ALLOC * MAX_DIMS * sizeof(float)); 
 }
 
 void voc_hog_set_octref(int ref_dimx, int ref_dimy, int oct)
@@ -88,11 +88,11 @@ void voc_hog_debug_resize_image(int width, int height, int res_wid, int res_hei,
     stopTimer(&tt);
     printf("time in voc_hog_resize_image = %f\n", getTimerValue(&tt));
 
-    cutilSafeCall(cudaMemset(d_pHist, 0, MAX_ALLOC * MAX_ALLOC * MAX_BINS * sizeof(float)));
+    cudaMemset(d_pHist, 0, MAX_ALLOC * MAX_ALLOC * MAX_BINS * sizeof(float));
 
-    cutilSafeCall(cudaMemset(d_pNorm, 0, MAX_ALLOC * MAX_ALLOC * sizeof(float)));
+    cudaMemset(d_pNorm, 0, MAX_ALLOC * MAX_ALLOC * sizeof(float));
 
-    cutilSafeCall(cudaMemset(d_pOut, 0, MAX_ALLOC * MAX_ALLOC * MAX_DIMS * sizeof(float)));
+    cudaMemset(d_pOut, 0, MAX_ALLOC * MAX_ALLOC * MAX_DIMS * sizeof(float));
 }
 
 
