@@ -2,8 +2,8 @@ VERSION = 0.7.0
 TEMPLATE = lib
 CONFIG += debug console
 
-QMAKE_CXXFLAGS += -fPIC -ffast-math -fomit-frame-pointer 
-QMAKE_CFLAGS += -fPIC -ffast-math -fomit-frame-pointer 
+QMAKE_CXXFLAGS += -fPIC -ffast-math -fomit-frame-pointer
+QMAKE_CFLAGS += -fPIC -ffast-math -fomit-frame-pointer
 
 HEADERS = get_cells.h get_features.h voc_hog.h process.h timer.h global.h \
 HOGDefines.h HOGUtils.h
@@ -23,8 +23,8 @@ cu.variable_out = OBJECTS
 INCLUDEPATH += /home/hushell/NVIDIA_GPU_Computing_SDK/C/common/inc
 INCLUDEPATH += /usr/local/cuda/include 
 QMAKE_CUFLAGS += $$QMAKE_CFLAGS
-## QMAKE_CUEXTRAFLAGS += -arch=sm_20 --ptxas-options=-v -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
-QMAKE_CUEXTRAFLAGS += -arch=sm_20 -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
+## QMAKE_CUEXTRAFLAGS += --ptxas-options=-v -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
+QMAKE_CUEXTRAFLAGS += -Xcompiler -fPIC -Xcompiler $$join(QMAKE_CUFLAGS, ",")
 QMAKE_CUEXTRAFLAGS += $(DEFINES) $(INCPATH) $$join(QMAKE_COMPILER_DEFINES, " -D", -D)
 QMAKE_CUEXTRAFLAGS += -c
 

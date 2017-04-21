@@ -5,6 +5,11 @@
 #include <fstream>
 #include <QImage>
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/imgcodecs/imgcodecs.hpp"
+#include "opencv2/opencv_modules.hpp"
+
 #include "process.h"
 #include "global.h"
 #include "timer.h"
@@ -100,61 +105,27 @@ void resize_im(float* src, int sh, int sw, int sc, float* dst, int res_dimy, int
 
 int main(int argc, char** argv)
 {
-	QImage img;
-	string example("../person_and_bike_006.png");
-	img.load(example.c_str());
-	if(img.isNull()) {
-		printf("loading failed!\n");
-		return -1;
-	}
+    cv::Mat img_src;
+    img_src = cv::imread("person_and_bike_006.png");
+    if (img_src.data == NULL)
+    {
+        printf("Unable to source image file: \n");
+        exit(EXIT_FAILURE);
+    }
 
-	printf("Color Depth = %d\n", img.depth());
-	printf("Bytes Count = %d\n", img.byteCount());
+    img_src.convertTo(img_src, CV_32F, 1.0/255.0);
+    cv::cvtColor(img_src, img_src, cv::COLOR_BGR2BGRA);
 
-	int height    = img.height();
-    int width     = img.width();
-	int bytePerLine = img.bytesPerLine();
+    // resize to a patch
+    cv::resize(img_src, img_src, cv::Size2d(64,64), 0, 0, cv::INTER_LINEAR);
 
-	printf("height = %d, width = %d, byteperline = %d\n", height, width, bytePerLine);
-
-	/*
-	QImage copy_image(width, height, QImage::Format_RGB32);
- 	QRgb value;
-	//ftype* data = (ftype*)malloc(sizeof(ftype)*3*height*width);
-	unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*3*height*width);
-	unsigned char* img_data = img.bits();
-	for (int i = 0; i < height; ++i)
-		for (int j = 0; j < width; ++j)
-	{
-		*(data+i*3*width+3*j + 0) = *(img_data+i*bytePerLine+j*4 + 0);
-		*(data+i*3*width+3*j + 1) = *(img_data+i*bytePerLine+j*4 + 1);
-		*(data+i*3*width+3*j + 2) = *(img_data+i*bytePerLine+j*4 + 2);
-		//BGR
-		value = qRgb(*(data+i*3*width+3*j + 2), *(data+i*3*width+3*j + 1), *(data+i*3*width+3*j + 0));
-		copy_image.setPixel(j, i, value);
-	}
-
-	copy_image.save("./copy_image.png", "PNG");
-	
-	return 0;
-	*/
+    int width = img_src.cols;
+    int height = img_src.rows;
 
 	ftype* data = (ftype*)malloc(sizeof(ftype)*4*height*width);
-	//unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*3*height*width);
-	unsigned char* img_data = img.bits();
-	printf("In main: first pixel = %d, %d, %d, %d\n", *(img_data), *(img_data+1), *(img_data+2), *(img_data+3));
-	
-	for (int i = 0; i < height; ++i)
-		for (int j = 0; j < width; ++j)
-	{
-		*(data+i * 4*width + 4*j + 0) = *(img_data+i*bytePerLine+j*4 + 0)*1.0f;
-		*(data+i * 4*width + 4*j + 1) = *(img_data+i*bytePerLine+j*4 + 1)*1.0f;
-		*(data+i * 4*width + 4*j + 2) = *(img_data+i*bytePerLine+j*4 + 2)*1.0f;
-		*(data+i * 4*width + 4*j + 3) = *(img_data+i*bytePerLine+j*4 + 3)*1.0f;
-		//BGR
-		//value = qRgb(*(data+i*3*width+3*j + 2), *(data+i*3*width+3*j + 1), *(data+i*3*width+3*j + 0));
-		//copy_image.setPixel(j, i, value);
-	}
+
+    if (img_src.isContinuous())
+    	data = img_src.ptr<float>(0);
 	
 	int maxoct = (int)log2(min(height, width) / (8.0)) - 1;
 	printf("maxoct = %d\n", maxoct);
@@ -162,6 +133,8 @@ int main(int argc, char** argv)
 	int blocks[2];
 	int hx, hy, hz;
 	int interv = 10;
+	interv = 1;
+	maxoct = 1;
 	int res_dimx = width, res_dimy = height;
 	float scale = 1.0f;
 	float* descriptor;
@@ -262,7 +235,7 @@ int main(int argc, char** argv)
     printf("--------------------------------------\n");
 
     startTimer(&tt);
-    process_all_scales(data, img.height(), img.width(), 8, featArr, maxoct, interv, eleSize);
+    process_all_scales(data, img_src.rows, img_src.cols, 8, featArr, maxoct, interv, eleSize);
     stopTimer(&tt);
 	printf("Features = %f\n", getTimerValue(&tt));
 

@@ -905,7 +905,7 @@ __host__ int voc_compute_gradients( int width, int height, int sbin,
 	Timer tt;
 	startTimer(&tt);
 #endif
-    
+
 	d_voc_compute_hists2<<< grid , threads >>> /*__traceable_call__*/ (width, height,
 	                                            blocks_0,blocks_1, sbin,
 												x_lbound, y_lbound, 
@@ -938,8 +938,7 @@ __host__ int voc_compute_gradients( int width, int height, int sbin,
 	//free(h_vv);
 
     //ComputeColorGradients(d_pImage4, d_pGradients, width, height);
-        
-//#define DEBUG_DUMP_GRADIENTS
+#define DEBUG_DUMP_GRADIENTS
 #ifdef DEBUG_DUMP_GRADIENTS
     
 	float *h_pGradMag = (float*) malloc(blocks_0*blocks_1*18*sizeof(float));
